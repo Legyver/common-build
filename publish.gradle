@@ -1,0 +1,131 @@
+group 'com.legyver'
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            def descript = ''
+            afterEvaluate { Project project ->
+                artifactId = project.name
+                descript = project.description
+            }
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Legyver-' + artifactId
+                url = 'https://github.com/Legyver/' + artifactId
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'ben.legyver'
+                        name = 'Ben Arnold'
+                        email = 'ben@legyver.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:github.com/Legyver/' + artifactId + '.git'
+                    developerConnection = 'scm:git:ssh://github.com/Legyver/'  + artifactId + '.git'
+                    url = 'https://github.com/Legyver/'  + artifactId + '/tree/master'
+                }
+                issueManagement {
+                    system = 'HackerOne'
+                    url = 'https://hackerone.com/central-security-project/reports/new'
+                }
+               withXml {
+                    //using pom.description can't resolve descript
+                    asNode().appendNode('description', descript)
+                    //add dependencies
+                    def dependenciesNode = asNode().appendNode('dependencies')
+
+                    project.configurations.implementation.allDependencies.each {
+                        println "dependency: $it"
+                        if (it.dependencyProject != null) {
+                          println 'DefaultProjectDependency'
+                        }
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                        dependencyNode.appendNode('scope', 'compile')
+                    }
+
+                   project.configurations.testImplementation.allDependencies.each {
+                       println "test dependency: $it"
+                       if (it.dependencyProject != null) {
+                         println 'DefaultProjectDependency'
+                       }
+                       def dependencyNode = dependenciesNode.appendNode('dependency')
+                       dependencyNode.appendNode('groupId', it.group)
+                       dependencyNode.appendNode('artifactId', it.name)
+                       dependencyNode.appendNode('version', it.version)
+                       dependencyNode.appendNode('scope', 'test')
+                   }
+               }
+            }
+        }
+    }
+    repositories {
+        // The repository to publish to, Sonatype/MavenCentral
+        maven {
+            name = "sonatype"
+
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            // You only need this if you want to publish snapshots, otherwise just set the URL
+            // to the release repo directly
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            // The ossrhUsername and ossrhPassword in ${user.home}/gradle.properties
+            credentials {
+                username ossrhUsername
+                password ossrhPassword
+            }
+        }
+    }
+}
+
+task printProperties {
+    doFirst {
+        println "username: $ossrhUsername"
+        println "password: $ossrhPassword"
+    }
+}
+
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+task install(dependsOn: "publishToMavenLocal")
