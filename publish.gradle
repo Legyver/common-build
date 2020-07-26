@@ -18,8 +18,17 @@ publishing {
             from components.java
             def descript = ''
             afterEvaluate { Project project ->
-                artifactId = project.name
-                descript = project.description
+                if (project.hasProperty('parentLibraryPrefix')) {
+                    println "parent $project.parentLibraryPrefix"
+                    artifactId = project.parentLibraryPrefix + '-' + project.name
+                } else {
+                    artifactId = project.name
+                }
+
+                if (project.hasProperty('description')) {
+                    descript = project.description
+                }
+                println "$group $artifactId-$version: $descript"
             }
 
             versionMapping {
@@ -32,6 +41,7 @@ publishing {
             }
             pom {
                 name = 'Legyver-' + artifactId
+                println "name: $name"
                 url = 'https://github.com/Legyver/' + artifactId
                 licenses {
                     license {
@@ -55,36 +65,11 @@ publishing {
                     system = 'HackerOne'
                     url = 'https://hackerone.com/central-security-project/reports/new'
                 }
-               withXml {
-                    //using pom.description can't resolve descript
+                withXml {
+                    //using pom.description description is resolved prematurely
+                    //as a workaround manually set it in the pom.xml
                     asNode().appendNode('description', descript)
-                    //add dependencies
-                    def dependenciesNode = asNode().appendNode('dependencies')
-
-                    project.configurations.implementation.allDependencies.each {
-                        println "dependency: $it"
-                        if (it.dependencyProject != null) {
-                          println 'DefaultProjectDependency'
-                        }
-                        def dependencyNode = dependenciesNode.appendNode('dependency')
-                        dependencyNode.appendNode('groupId', it.group)
-                        dependencyNode.appendNode('artifactId', it.name)
-                        dependencyNode.appendNode('version', it.version)
-                        dependencyNode.appendNode('scope', 'compile')
-                    }
-
-                   project.configurations.testImplementation.allDependencies.each {
-                       println "test dependency: $it"
-                       if (it.dependencyProject != null) {
-                         println 'DefaultProjectDependency'
-                       }
-                       def dependencyNode = dependenciesNode.appendNode('dependency')
-                       dependencyNode.appendNode('groupId', it.group)
-                       dependencyNode.appendNode('artifactId', it.name)
-                       dependencyNode.appendNode('version', it.version)
-                       dependencyNode.appendNode('scope', 'test')
-                   }
-               }
+                }
             }
         }
     }
