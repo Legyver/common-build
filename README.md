@@ -1,5 +1,14 @@
 # common-build
 Common build files
+
+## publish.gradle
+Publish and upload signed artifacts.
+
+Applies the following plugins
+- java-library
+- maven-publish
+- signing
+
 ##Prerequisites
 ### Gradle version 6.X
 ### GPG
@@ -19,12 +28,6 @@ Putting these values in your gradle home allows them to be shared across project
 
 ##Usage
 ```gradle
-plugins {
-    id 'java-library'
-    id 'maven-publish'
-    id 'signing'
-}
-
 //required properties
 version = '1.0.0.0'
 description = 'My required description'
@@ -32,7 +35,7 @@ description = 'My required description'
 //optional prefix to be prepended to the libary name ie: library-<project-name> 
 parentLibraryPrefix=library
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.0/publish.gradle'
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.1/publish.gradle'
 ```
 ### Targets
 #### printProperties
