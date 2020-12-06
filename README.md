@@ -35,7 +35,7 @@ description = 'My required description'
 //optional prefix to be prepended to the libary name ie: library-<project-name> 
 parentLibraryPrefix=library
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.1/publish.gradle'
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.2/publish.gradle'
 ```
 ### Targets
 #### printProperties
