@@ -1,0 +1,116 @@
+group 'com.legyver'
+
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            def descript = ''
+            afterEvaluate { Project project ->
+                println "parent $project.parentLibraryPrefix"
+
+                if (project.hasProperty('description')) {
+                    descript = project.description
+                }
+                println "$group $artifactId:$version: $descript"
+            }
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Legyver-' + artifactId
+                println "name: $name"
+                url = 'https://github.com/Legyver/' + project.parentLibraryPrefix + '/tree/master/' + artifactId
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'ben.legyver'
+                        name = 'Ben Arnold'
+                        email = 'ben@legyver.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:github.com/Legyver/' + project.parentLibraryPrefix + '.git'
+                    developerConnection = 'scm:git:ssh://github.com/Legyver/'  + project.parentLibraryPrefix + '.git'
+                    url = 'https://github.com/Legyver/'  + project.parentLibraryPrefix + '/tree/master/' + artifactId
+                }
+                issueManagement {
+                    system = 'HackerOne'
+                    url = 'https://hackerone.com/central-security-project/reports/new'
+                }
+                withXml {
+                    //using pom.description description is resolved prematurely
+                    //as a workaround manually set it in the pom.xml
+                    asNode().appendNode('description', descript)
+                }
+            }
+        }
+    }
+    repositories {
+        // The repository to publish to, Sonatype/MavenCentral
+        maven {
+            name = "sonatype"
+
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            // You only need this if you want to publish snapshots, otherwise just set the URL
+            // to the release repo directly
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+            // The ossrhUsername and ossrhPassword in ${user.home}/gradle.properties
+            credentials {
+                username ossrhUsername
+                password ossrhPassword
+            }
+        }
+    }
+}
+
+task printProperties {
+    doFirst {
+        println "username: $ossrhUsername"
+        println "password: $ossrhPassword"
+    }
+}
+
+
+signing {
+    useGpgCmd()
+    sign publishing.publications.mavenJava
+}
+
+
+javadoc {
+    failOnError = false
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
+}
+
+task install(dependsOn: "publishToMavenLocal")
