@@ -1,0 +1,20 @@
+
+task signDist( dependsOn: "installDist") {
+    doLast {
+        StringJoiner sj = new StringJoiner(File.separator)
+                .add(buildDir.getAbsolutePath()).add('install').add(rootProject.name).add('lib');
+        File installLibDir = new File(sj.toString());
+
+        for (File jar : installLibDir.listFiles()) {
+            String jarName = jar.getAbsolutePath();
+            println "signing jar: $jarName"
+
+            def stdout = new ByteArrayOutputStream();
+            exec {
+                commandLine 'cmd', '/c', "jarsigner -storepass $jarsignerPassw $jarName $jarsignerAlias"
+                standardOutput = stdout;
+            }
+            println "Output: $stdout"
+        }
+    }
+}
