@@ -2,7 +2,9 @@ group 'com.legyver'
 
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
-apply plugin: 'signing'
+if (ossrhUsername != null && ossrhUsername.length() > 0) {
+  apply plugin: 'signing'
+}
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -79,21 +81,25 @@ publishing {
     }
     repositories {
         // The repository to publish to, Sonatype/MavenCentral
-        maven {
-            name = "sonatype"
+        if (ossrhUsername == null || ossrhUsername.length() == 0) {
+          println 'skipping signing'
+        } else {
+          maven {
+              name = "sonatype"
 
-            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-            // You only need this if you want to publish snapshots, otherwise just set the URL
-            // to the release repo directly
-            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+              def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+              def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+              // You only need this if you want to publish snapshots, otherwise just set the URL
+              // to the release repo directly
+              url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
-            // The ossrhUsername and ossrhPassword in ${user.home}/gradle.properties
-            credentials {
-                username ossrhUsername
-                password ossrhPassword
-            }
-        }
+              // The ossrhUsername and ossrhPassword in ${user.home}/gradle.properties
+              credentials {
+                  username ossrhUsername
+                  password ossrhPassword
+              }
+          }
+          }
     }
 }
 
@@ -104,10 +110,11 @@ task printProperties {
     }
 }
 
-
-signing {
-    useGpgCmd()
-    sign publishing.publications.mavenJava
+if (ossrhUsername != null && ossrhUsername.length() > 0) {
+  signing {
+      useGpgCmd()
+      sign publishing.publications.mavenJava
+  }
 }
 
 

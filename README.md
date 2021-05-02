@@ -17,15 +17,24 @@ Supports the following targets
     - publishes the signed artifacts to your remote repository
 
 Configuration
+- ${gradle.user.home}/gradle.properties
+```
+ossrhUsername=
+```
 - build.properties
 ```groovy
 description = 'A required description'
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.2/publishLibraryModule.gradle' //java 9+ multi-module
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.5/publish.gradle' //java 9+
 ```
 
 ## publishLibraryModule.gradle
 Same as above, but has the URLs corrected for multi-module libraries with a root library.
+```groovy
+description = 'A required description'
+
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.5/publish.LibraryModulegradle' //java 9+ multi-module
+```
 
 ### usage
 Supports the following targets
@@ -35,6 +44,10 @@ Supports the following targets
     - publishes the signed artifacts to your remote repository
 
 Configuration
+- ${gradle.user.home}/gradle.properties
+```
+ossrhUsername=
+```
 - gradle.properties
 ```properties
 # below is where the .git resource and project url refer to the subproject urls will have '/tree/master/<artifactId>' appended subproject direct linking
@@ -43,7 +56,7 @@ parentLibraryPrefix=<parent_library_repo>
 - build.gradle
 ```groovy
 ext {
-    publishBuildScript = 'https://raw.githubusercontent.com/Legyver/common-build/1.3/publishLibraryModule.gradle' //java 9+ multi-module
+    publishBuildScript = 'https://raw.githubusercontent.com/Legyver/common-build/1.5/publishLibraryModule.gradle' //java 9+ multi-module
 }
 ```
 - subproject/build.gradle
