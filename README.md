@@ -103,7 +103,7 @@ jarsignerPassw=<storepass>
 ```
 Putting these values in your gradle home allows them to be shared across projects without checking them in and helps keep your secrets safe.
 
-Note: on windows the signing path uses the <userhome>/AppData/Roaming/.gnupg folder. 
+Note: on windows the signing path uses the {userhome}/AppData/Roaming/gnupg folder. The gpg.conf file may-or-may-not exist depending on the version of gpg.
 
 ## Usage
 ```gradle
