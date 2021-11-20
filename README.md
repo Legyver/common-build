@@ -82,11 +82,12 @@ apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.4/jarsigne
 
 
 
-##Prerequisites
+## Prerequisites
 ### Gradle version 6.X
 ### GPG
 On Windows, you can use gpg4Win https://www.gpg4win.org/
-### {gradle.home}/gradle.properties
+### Configuration
+- {gradle.user.home}/gradle.properties
 ```properties
 signing.gnupg.executable=gpg
 signing.gnupg.useLegacyGpg=true
@@ -102,7 +103,9 @@ jarsignerPassw=<storepass>
 ```
 Putting these values in your gradle home allows them to be shared across projects without checking them in and helps keep your secrets safe.
 
-##Usage
+Note: on windows the signing path uses the <userhome>/AppData/Roaming/.gnupg folder. 
+
+## Usage
 ```gradle
 //required properties
 version = '1.0.0.0'
