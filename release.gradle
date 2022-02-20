@@ -1,8 +1,3 @@
-plugins {
-    id 'java'
-    id 'application'
-}
-
 tasks.register('updateReleaseProperties') {
     Properties releaseProperties = new Properties();
     String releasePropertiesFileName = project.name + '-release.properties';

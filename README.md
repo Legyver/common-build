@@ -101,6 +101,11 @@ Supports all normal 'application' tasks
 Configuration
 - build.gradle
 ```groovy
+plugins {
+  id 'java'
+  id 'application'
+}
+
 apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.6/release.gradle' //java 9+
 ```
 
