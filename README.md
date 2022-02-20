@@ -106,7 +106,7 @@ plugins {
   id 'application'
 }
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.6/release.gradle' //java 9+
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.6.1/release.gradle' //java 9+
 ```
 
 
