@@ -21,7 +21,7 @@ Configuration
 ```
 ossrhUsername=
 ```
-- build.properties
+- build.gradle
 ```groovy
 description = 'A required description'
 
@@ -80,6 +80,29 @@ Configuration
 apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.4/jarsigner.gradle'
 ```
 
+## release.gradle
+Generate the following property files for identifying versions-specific files and prerequisites
+- <application_name>-release.properties
+  - Listing of releases and version numbers
+    - ie: release[0]=1.0.0.0
+  - The latest release will have the highest index
+- <application_name>-runtime.properties
+  - Listing of required runtimes
+    - ie: java.runtime.win64=zulu15.32.15-ca-fx-jdk15.0.3-win_x64.zip
+
+Applies the following plugins
+- java-library
+- maven-publish
+- signing
+
+### usage
+Supports all normal 'application' tasks
+
+Configuration
+- build.gradle
+```groovy
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.6/release.gradle' //java 9+
+```
 
 
 ## Prerequisites
