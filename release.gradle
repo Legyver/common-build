@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+tasks.register('updateReleaseProperties') {
+    Properties releaseProperties = new Properties();
+    String releasePropertiesFileName = project.name + '-release.properties';
+    File releasePropertiesFile = new File(releasePropertiesFileName);
+    String key = "release[0]";
+    String lastVersion;
+    if (releasePropertiesFile.exists()) {
+        FileInputStream fis = new FileInputStream(releasePropertiesFile);
+        releaseProperties.load(fis);
+        fis.close();
+        for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            key = "release[" + i + "]";
+            if (releaseProperties.hasProperty(key)) {
+                lastVersion = releaseProperties.get(key);
+                if (version.equals(lastVersion)) {
+                    //re-use current release since no version bump
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+    println('Adding ' + key + '=' + version);
+    releaseProperties.put(key, version);
+    FileOutputStream fos = new FileOutputStream(releasePropertiesFile);
+    releaseProperties.store(fos, "Generated: " + new Date());
+    fos.close();
+}
+
+tasks.register('updateRuntimeProperties') {
+    String runtimePropertiesFileName = project.name + '-runtime.properties';
+    File runtimePropertiesFile = new File(runtimePropertiesFileName);
+
+    Properties runtimeProperties = new Properties();
+    String javaHome = System.properties.get("java.home");
+
+    int indexLastSep = javaHome.lastIndexOf(File.separator);
+    int indexLastDash = javaHome.lastIndexOf('-');
+    String runtimeVersion = javaHome.substring(indexLastSep + 1, indexLastDash);
+    println "runtime version: " + runtimeVersion
+
+    runtimeProperties.put("java.runtime.win64", runtimeVersion + '-win_x64.zip')
+    runtimeProperties.put("java.runtime.osx", runtimeVersion + '-macosx_x64.tar.gz')
+    runtimeProperties.put("java.runtime.linux", runtimeVersion + '-linux_x64.tar.gz')
+
+    FileOutputStream fos = new FileOutputStream(runtimePropertiesFile);
+    runtimeProperties.store(fos, "Generated: " + new Date());
+    fos.close();
+}
+
+assembleDist.dependsOn updateReleaseProperties
+assembleDist.dependsOn updateRuntimeProperties
