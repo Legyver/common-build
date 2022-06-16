@@ -72,9 +72,9 @@ publishing {
                 }
                 developers {
                     developer {
-                        id = 'ben.legyver'
-                        name = 'Ben Arnold'
-                        email = 'ben@legyver.com'
+                        id = developerId
+                        name = developerName
+                        email = developerEmail
                     }
                 }
                 scm {

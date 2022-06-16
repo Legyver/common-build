@@ -1,7 +1,7 @@
 # common-build
 Common build files
 
-For versions 1.7+ the manifest can include the following attributes:
+For versions 1.7.1+ the manifest can include the following attributes:
 - 'Built-By'
   - Read from ossrhUsername in ${gradle.user.home}/gradle.properties
 - 'Build-Timestamp'
@@ -14,6 +14,14 @@ For versions 1.7+ the manifest can include the following attributes:
   - JDK Version built-on
 - 'Build-OS'
   - The OS version used to build the library
+
+Additionally, for versions 1.7.1+ the developer information is read from the ${gradle.user.home}/gradle.properties instead of being hard-coded.
+Please add the following to your ${gradle.user.home}/gradle.properties
+```properties
+developerId=<developer id (preferably the same as ossrhUsername)>
+developerName=<developer name>
+developerEmail=<developer email>
+```
 
 ## publish.gradle
 Publish and upload signed artifacts.  Use this one for standalone libraries that are not modular
@@ -68,7 +76,7 @@ buildscript {
 
 description = 'A required description'
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.7/publish.LibraryModulegradle' //java 9+ multi-module
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.7.1/publish.LibraryModulegradle' //java 9+ multi-module
 ```
 
 ### usage

@@ -2,6 +2,7 @@ group 'com.legyver'
 
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
+apply plugin: 'net.nemerosa.versioning'
 
 
 if (ossrhUsername != null && ossrhUsername.length() > 0) {
@@ -18,6 +19,19 @@ repositories {
 java {
     withJavadocJar()
     withSourcesJar()
+}
+
+jar {
+    manifest {
+        attributes(
+                'Built-By'       : ossrhUsername,
+                'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
+                'Build-Revision' : versioning.info.commit,
+                'Created-By'     : "Gradle ${gradle.gradleVersion}",
+                'Build-Jdk'      : "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS'       : "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}"
+        )
+    }
 }
 
 publishing {
@@ -54,9 +68,9 @@ publishing {
                 }
                 developers {
                     developer {
-                        id = 'ben.legyver'
-                        name = 'Ben Arnold'
-                        email = 'ben@legyver.com'
+                        id = developerId
+                        name = developerName
+                        email = developerEmail
                     }
                 }
                 scm {
