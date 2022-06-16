@@ -1,6 +1,20 @@
 # common-build
 Common build files
 
+For versions 1.7+ the manifest can include the following attributes:
+- 'Built-By'
+  - Read from ossrhUsername in ${gradle.user.home}/gradle.properties
+- 'Build-Timestamp'
+  - Current time stamp in yyyy-MM-dd'T'HH:mm:ss.SSSZ format
+- 'Build-Revision'
+  - Git hash
+- 'Created-By'
+  - Gradle version
+- 'Build-Jdk'
+  - JDK Version built-on
+- 'Build-OS'
+  - The OS version used to build the library
+
 ## publish.gradle
 Publish and upload signed artifacts.  Use this one for standalone libraries that are not modular
 
@@ -23,17 +37,38 @@ ossrhUsername=
 ```
 - build.gradle
 ```groovy
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.net.nemerosa:versioning:3.0.0"
+  }
+}
+
 description = 'A required description'
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.5/publish.gradle' //java 9+
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.7/publish.gradle' //java 9+
 ```
-
 ## publishLibraryModule.gradle
 Same as above, but has the URLs corrected for multi-module libraries with a root library.
 ```groovy
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.net.nemerosa:versioning:3.0.0"
+  }
+}
+
 description = 'A required description'
 
-apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.5/publish.LibraryModulegradle' //java 9+ multi-module
+apply from: 'https://raw.githubusercontent.com/Legyver/common-build/1.7/publish.LibraryModulegradle' //java 9+ multi-module
 ```
 
 ### usage
