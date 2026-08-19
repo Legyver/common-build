@@ -4,8 +4,18 @@ apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 apply plugin: 'net.nemerosa.versioning'
 
+// Published via the Central Publisher Portal (central.sonatype.com), which replaced
+// the legacy OSSRH/oss.sonatype.org Nexus instance (sunset 2025-06-30). The staging
+// repository itself (URL + close/release lifecycle) is configured once at the root
+// project via the io.github.gradle-nexus.publish-plugin; this script only wires up
+// the publication content and signing.
+// Credentials come from a Central Portal User Token, set in ${user.home}/gradle.properties:
+//   sonatypeUsername=<token username>
+//   sonatypePassword=<token password>
+def sonatypeUsername = project.findProperty('sonatypeUsername')
+def sonatypePassword = project.findProperty('sonatypePassword')
 
-if (ossrhUsername != null && ossrhUsername.length() > 0) {
+if (sonatypeUsername != null && sonatypeUsername.length() > 0) {
   apply plugin: 'signing'
 }
 
@@ -24,7 +34,7 @@ java {
 jar {
     manifest {
         attributes(
-                'Built-By'       : ossrhUsername,
+                'Built-By'       : sonatypeUsername,
                 'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(new Date()),
                 'Build-Revision' : versioning.info.commit,
                 'Created-By'     : "Gradle ${gradle.gradleVersion}",
@@ -90,38 +100,22 @@ publishing {
             }
         }
     }
-    if (ossrhUsername == null || ossrhUsername.length() == 0) {
+    if (sonatypeUsername == null || sonatypeUsername.length() == 0) {
       println 'skipping signing'
-    } else {
-      repositories {
-          // The repository to publish to, Sonatype/MavenCentral
-          maven {
-              name = "sonatype"
-
-              def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-              def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
-              // You only need this if you want to publish snapshots, otherwise just set the URL
-              // to the release repo directly
-              url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-
-              // The ossrhUsername and ossrhPassword in ${user.home}/gradle.properties
-              credentials {
-                  username ossrhUsername
-                  password ossrhPassword
-              }
-          }
-      }
     }
+    // No repositories{} block here: the "sonatype" staging/release repository is
+    // registered for this project automatically by the root project's
+    // io.github.gradle-nexus.publish-plugin (see nexusPublishing {} in the root build.gradle).
 }
 
 task printProperties {
     doFirst {
-        println "username: $ossrhUsername"
-        println "password: $ossrhPassword"
+        println "username: $sonatypeUsername"
+        println "password: [redacted, length=${sonatypePassword == null ? 0 : sonatypePassword.length()}]"
     }
 }
 
-if (ossrhUsername != null && ossrhUsername.length() > 0) {
+if (sonatypeUsername != null && sonatypeUsername.length() > 0) {
   signing {
         println 'signing'
         useGpgCmd()
